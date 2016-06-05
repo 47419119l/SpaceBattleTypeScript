@@ -6,7 +6,7 @@ module ElMeuJoc {
         preload():void {
             super.preload();
 
-            this.stage.backgroundColor = "#74538f";
+            this.stage.backgroundColor = "#edfeff";
             // Add Text
             var etiquetaCargando = this.add.text(this.world.centerX, 150, 'cargando...',
                 {font: '30px Arial', fill: '#ffffff'});
@@ -20,7 +20,11 @@ module ElMeuJoc {
             this.load.bitmapFont('carrier_command', 'assets/fonts/bitmapFonts/carrier_command.png', 'assets/fonts/bitmapFonts/carrier_command.xml');
 
             //Load Image
-            this.game.load.image('baldainici', 'assets/baldaInici.png');
+            this.game.load.image('shipbomber', 'assets/ship_bomber.png');
+            this.game.load.image('enemy1', 'assets/enemy00.png');
+            this.game.load.image('enemy2', 'assets/enemy01.png');
+            this.game.load.image('bullet', 'assets/purple_ball.png');
+
             // Load Audios
             this.load.audio('audio', 'assets/audio/SoundEffects/p-ping.mp3');
             //Start physics.
@@ -31,7 +35,7 @@ module ElMeuJoc {
         create():void {
             super.create();
             //Start game state
-           // this.game.state.start('menu');
+            this.game.state.start('game');
         }
     }
 }

@@ -57,7 +57,7 @@ var ElMeuJoc;
         }
         LoadState.prototype.preload = function () {
             _super.prototype.preload.call(this);
-            this.stage.backgroundColor = "#74538f";
+            this.stage.backgroundColor = "#edfeff";
             // Add Text
             var etiquetaCargando = this.add.text(this.world.centerX, 150, 'cargando...', { font: '30px Arial', fill: '#ffffff' });
             etiquetaCargando.anchor.setTo(0.5, 0.5);
@@ -68,7 +68,10 @@ var ElMeuJoc;
             //Load Font
             this.load.bitmapFont('carrier_command', 'assets/fonts/bitmapFonts/carrier_command.png', 'assets/fonts/bitmapFonts/carrier_command.xml');
             //Load Image
-            this.game.load.image('baldainici', 'assets/baldaInici.png');
+            this.game.load.image('shipbomber', 'assets/ship_bomber.png');
+            this.game.load.image('enemy1', 'assets/enemy00.png');
+            this.game.load.image('enemy2', 'assets/enemy01.png');
+            this.game.load.image('bullet', 'assets/purple_ball.png');
             // Load Audios
             this.load.audio('audio', 'assets/audio/SoundEffects/p-ping.mp3');
             //Start physics.
@@ -77,7 +80,7 @@ var ElMeuJoc;
         LoadState.prototype.create = function () {
             _super.prototype.create.call(this);
             //Start game state
-            // this.game.state.start('menu');
+            this.game.state.start('game');
         };
         return LoadState;
     })(Phaser.State);
@@ -93,12 +96,50 @@ var ElMeuJoc;
         __extends(gameState, _super);
         function gameState() {
             _super.apply(this, arguments);
+            this.nextFire = 0;
+            this.fireRate = 100;
         }
+        /**
+         * Configuracion grupo balas
+         */
+        gameState.prototype.configBullet = function () {
+            this.bullets = this.game.add.group();
+            this.bullets.enableBody = true;
+            this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
+            this.bullets.createMultiple(3, 'bullet');
+            this.bullets.setAll('checkWorldBounds', true);
+            this.bullets.setAll('outOfBoundsKill', true);
+        };
+        /**
+         * Configuración de nave
+         */
+        gameState.prototype.configBomberShip = function () {
+            this.bombership = this.game.add.sprite(this.game.world.centerX - 320, this.game.world.height - 300, 'shipbomber');
+            this.bombership.anchor.setTo(0.5, 0.5);
+            this.game.physics.enable(this.bombership, Phaser.Physics.ARCADE);
+        };
         gameState.prototype.create = function () {
             _super.prototype.create.call(this);
+            this.configBullet();
+            this.configBomberShip();
         };
         gameState.prototype.update = function () {
             _super.prototype.update.call(this);
+            this.bombership.rotation = this.game.physics.arcade.angleToPointer(this.bombership);
+            if (this.game.input.activePointer.isDown) {
+                this.fire();
+            }
+        };
+        /**
+         * Función fuego.
+         */
+        gameState.prototype.fire = function () {
+            if (this.game.time.now > this.nextFire && this.bullets.countDead() > 0) {
+                this.nextFire = this.game.time.now + this.fireRate;
+                var bullet = this.bullets.getFirstDead();
+                bullet.reset(this.bombership.x - 8, this.bombership.y - 8);
+                this.game.physics.arcade.moveToPointer(bullet, 300);
+            }
         };
         return gameState;
     })(Phaser.State);
